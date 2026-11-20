@@ -1,1 +1,306 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learn HTML Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* VOICE: friendly, clear, a patient teacher's handout
+   IDEA: an annotated textbook page with a live lab bench beside it
+   PICTURE: the editor and live preview, side by side, plus a labelled tag anatomy
+   COLOUR and TYPE: white, ink, ultramarine accent, cool grey; Spectral titles, Inter body, JetBrains Mono code
+   LAYOUT: lesson list, then editor and preview, then notes and a challenge */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0d0e18);--ink:light-dark(#14110f,#ecebf3);--soft:light-dark(#5d6170,#a3a6b8);
+--line:light-dark(#dfe1e8,#262838);--panel:light-dark(#f4f5f8,#151726);--accent:light-dark(#1d2bd8,#8e98ff);
+--accentbg:light-dark(#e8eaff,#1c2150);--code:light-dark(#10122a,#0a0b14);--codeink:#e6e8ff;
+--tag:#8fa2ff;--attr:#ffb86b;--val:#9be3a5;--txt:#e6e8ff}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(28px,4vw,64px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,h3{font-family:Spectral,Georgia,serif;font-weight:500;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,5vw,52px)}
+h2{font-size:clamp(26px,3vw,34px);margin-bottom:12px}
+h3{font-size:22px;margin-bottom:8px}
+p{margin:0 0 12px;max-width:68ch}
+.lede{font-size:17px;color:var(--soft);margin-top:14px}
+code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.88em;background:var(--accentbg);color:var(--accent);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+header.band{padding-bottom:20px}
+.top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(20px,4vw,56px);align-items:center}
+/* anatomy figure */
+.anat{background:var(--code);border-radius:14px;padding:26px 20px 18px;color:var(--codeink);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 18px 40px -24px rgba(20,20,60,.6)}
+.anat .line{font:clamp(14px,1.9vw,19px)/1.4 "JetBrains Mono",monospace;display:flex;flex-wrap:wrap;justify-content:center;gap:2px}
+.anat .seg{padding:6px 4px;border-radius:6px;border-bottom:3px solid}
+.s1{color:var(--tag);border-color:var(--tag)}.s2{color:var(--attr);border-color:var(--attr)}.s3{color:var(--txt);border-color:#c9cbe0}.s4{color:var(--tag);border-color:var(--tag);opacity:.85}
+.keys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px;font-size:13px;color:#c3c6e3}
+.keys b{display:block;font-weight:600;font-size:14px}
+.k1 b{color:var(--tag)}.k2 b{color:var(--attr)}.k3 b{color:var(--txt)}.k4 b{color:var(--tag)}
+/* lesson nav */
+.scroll{overflow-x:auto}
+nav.lessons{display:flex;gap:8px;padding:4px 0 14px;scrollbar-width:thin}
+nav.lessons button{flex:none;font:500 15px Inter,sans-serif;min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+nav.lessons button .n{color:var(--soft);margin-right:6px}
+nav.lessons button[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+nav.lessons button[aria-selected=true] .n{color:#d9dcff}
+button:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* bench */
+.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.pane{display:flex;flex-direction:column;min-height:440px}
+.pane+.pane{border-left:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px 8px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--soft);flex-wrap:wrap}
+.bar .tools{display:flex;gap:6px}
+.bar button{font:500 13px Inter,sans-serif;min-height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.bar button:hover{border-color:var(--accent);color:var(--accent)}
+textarea{flex:1;width:100%;resize:none;border:0;margin:0;padding:16px;background:var(--code);color:var(--codeink);font:15px/1.6 "JetBrains Mono",ui-monospace,monospace;tab-size:2;white-space:pre;overflow:auto}
+iframe{flex:1;width:100%;border:0;background:#fff}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#2fbf71;margin-right:6px;vertical-align:1px}
+/* notes */
+.notes{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(20px,4vw,48px);margin-top:28px}
+.try{background:var(--accentbg);border-radius:12px;padding:20px 22px}
+.try h3{color:var(--accent)}
+.try ol{margin:0;padding-left:20px}.try li{margin-bottom:6px}
+.tips{color:var(--soft);font-size:14px;margin-top:6px}
+footer{border-top:1px solid var(--line);color:var(--soft);font-size:14px}
+footer ul{margin:8px 0 0;padding-left:20px}
+@media(max-width:900px){.top{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){.bench{grid-template-columns:minmax(0,1fr)}.pane+.pane{border-left:0;border-top:1px solid var(--line)}.pane{min-height:320px}.notes{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:520px){.keys{grid-template-columns:repeat(2,minmax(0,1fr))}textarea{font-size:14px}}
+@media(prefers-reduced-motion:no-preference){iframe{transition:opacity .2s}iframe.fade{opacity:.4}}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap top">
+    <div>
+      <h1>Learn HTML by changing it and watching what happens</h1>
+      <p class="lede">HTML is the language that tells a browser what is on a page: a heading here, a paragraph there, a link, a picture. Pick a lesson below, edit the code on the left, and the page on the right updates as you type.</p>
+    </div>
+    <figure class="anat" aria-label="Anatomy of an HTML element">
+      <div class="line">
+        <span class="seg s1">&lt;a</span><span class="seg s2">&nbsp;href="page.html"</span><span class="seg s1">&gt;</span><span class="seg s3">Click me</span><span class="seg s4">&lt;/a&gt;</span>
+      </div>
+      <div class="keys">
+        <div class="k1"><b>Opening tag</b>Starts the element and names it: <i>a</i> means link.</div>
+        <div class="k2"><b>Attribute</b>Extra detail. Here, where the link goes.</div>
+        <div class="k3"><b>Content</b>What the reader actually sees.</div>
+        <div class="k4"><b>Closing tag</b>Same name with a slash. The element ends here.</div>
+      </div>
+    </figure>
+  </div>
+</header>
+
+<main class="band" style="padding-top:12px">
+  <div class="wrap">
+    <nav class="lessons scroll" id="nav" role="tablist" aria-label="Lessons"></nav>
+    <div class="bench">
+      <div class="pane">
+        <div class="bar"><span>Your code (edit me)</span>
+          <span class="tools"><button id="reset" type="button">Reset</button><button id="copy" type="button">Copy</button></span></div>
+        <textarea id="ed" spellcheck="false" aria-label="HTML code editor" autocapitalize="off" autocomplete="off"></textarea>
+      </div>
+      <div class="pane">
+        <div class="bar"><span><span class="dot"></span>Live preview</span><span id="status">Updates as you type</span></div>
+        <iframe id="pv" title="Live preview of your HTML" sandbox="allow-scripts allow-forms"></iframe>
+      </div>
+    </div>
+    <div class="notes">
+      <section><h2 id="lt"></h2><div id="why"></div></section>
+      <aside class="try"><h3>Try this</h3><ol id="tasks"></ol><p class="tips">Broke it? Press Reset to get the original back. Your edits to each lesson are remembered in this browser.</p></aside>
+    </div>
+  </div>
+</main>
+
+<footer class="band">
+  <div class="wrap">
+    <h3>Where to go next</h3>
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Learn/HTML">MDN: Learn HTML</a>, the most trusted free reference.</li>
+      <li>Save any lesson's code (Copy, then paste into a file called <code>index.html</code>) and double-click it to open it in your own browser.</li>
+      <li>Right-click any website and choose "View page source" to see its HTML.</li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+{
+const L=[
+{t:"The skeleton",
+why:`<p>Every HTML page has the same basic frame. <code>&lt;!DOCTYPE html&gt;</code> tells the browser this is modern HTML. Everything sits inside <code>&lt;html&gt;</code>.</p>
+<p>The <code>&lt;head&gt;</code> holds information <em>about</em> the page (like the <code>&lt;title&gt;</code> shown on the browser tab). The <code>&lt;body&gt;</code> holds everything you actually see.</p>
+<p>Notice how elements sit inside other elements, like boxes in boxes. That nesting is the heart of HTML.</p>`,
+tasks:["Change the text inside the &lt;h1&gt;.","Add a second &lt;p&gt; paragraph under the first.","Delete the closing &lt;/p&gt; and see how forgiving the browser is."],
+code:`<!DOCTYPE html>
+<html>
+  <head>
+    <title>My first page</title>
+  </head>
+  <body>
+    <h1>Hello, world!</h1>
+    <p>This is my very first web page.</p>
+  </body>
+</html>`},
+{t:"Headings and text",
+why:`<p>There are six heading levels, <code>&lt;h1&gt;</code> (most important) down to <code>&lt;h6&gt;</code>. Use them like the outline of a document, not just to make text big.</p>
+<p><code>&lt;p&gt;</code> is a paragraph. Inside text you can use <code>&lt;strong&gt;</code> for importance (bold), <code>&lt;em&gt;</code> for emphasis (italic) and <code>&lt;br&gt;</code> for a line break. Some elements, like <code>&lt;br&gt;</code> and <code>&lt;hr&gt;</code>, have no closing tag because they have no content.</p>`,
+tasks:["Turn the &lt;h3&gt; into an &lt;h2&gt;.","Make the word \"fresh\" bold with &lt;strong&gt;.","Try adding lots of spaces between two words. Browsers squash extra spaces into one."],
+code:`<h1>The Corner Bakery</h1>
+<h2>About us</h2>
+<p>We bake <em>fresh</em> bread every morning.<br>
+Open from 7am, closed on Mondays.</p>
+
+<hr>
+
+<h3>Today's special</h3>
+<p><strong>Cinnamon rolls</strong>, still warm.</p>`},
+{t:"Links and images",
+why:`<p><code>&lt;a&gt;</code> makes a link. Its <code>href</code> attribute says where to go. Adding <code>target="_blank"</code> opens it in a new tab.</p>
+<p><code>&lt;img&gt;</code> shows a picture. <code>src</code> is the image's address and <code>alt</code> describes it for people using screen readers, or if the image fails to load. Always write a good <code>alt</code>.</p>
+<p>(The picture here is a tiny drawing written in code, so it works without the internet.)</p>`,
+tasks:["Change the link text to something else.","Change the alt text, then break the src (delete a letter) to see alt text appear.","Add width=\"80\" to the &lt;img&gt; to shrink it."],
+code:`<h1>Links and pictures</h1>
+
+<p>Read more on
+  <a href="https://developer.mozilla.org" target="_blank">the MDN website</a>.
+</p>
+
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23cfe8ff'/%3E%3Ccircle cx='92' cy='22' r='12' fill='%23ffd23f'/%3E%3Cpath d='M0 80 40 34 70 64 86 50 120 80Z' fill='%232f7a4f'/%3E%3C/svg%3E"
+     alt="A drawing of green hills under a yellow sun"
+     width="240">`},
+{t:"Lists",
+why:`<p>Use <code>&lt;ul&gt;</code> for an unordered list (bullets) and <code>&lt;ol&gt;</code> for an ordered list (numbers). Each item goes in an <code>&lt;li&gt;</code>.</p>
+<p>Lists can be nested: put a whole new list <em>inside</em> an <code>&lt;li&gt;</code>.</p>`,
+tasks:["Add a fourth step to the recipe.","Change &lt;ol&gt; to &lt;ul&gt; (both tags!) and watch the numbers become bullets.","Add a nested list of toppings under \"Add toppings\"."],
+code:`<h2>Shopping list</h2>
+<ul>
+  <li>Flour</li>
+  <li>Eggs</li>
+  <li>Milk</li>
+</ul>
+
+<h2>Pancake recipe</h2>
+<ol>
+  <li>Whisk everything together</li>
+  <li>Cook in a hot pan</li>
+  <li>Add toppings</li>
+</ol>`},
+{t:"Tables",
+why:`<p>Tables are for data with rows and columns. <code>&lt;table&gt;</code> wraps it all, <code>&lt;tr&gt;</code> is a table row, <code>&lt;th&gt;</code> is a header cell and <code>&lt;td&gt;</code> is an ordinary data cell.</p>
+<p>The <code>border</code> attribute here is old-fashioned; normally you'd style borders with CSS (see the Style lesson).</p>`,
+tasks:["Add a new row for another day.","Add a fourth column called \"Rain?\".","Remove border=\"1\" and see how plain it looks."],
+code:`<h2>Weekly weather</h2>
+<table border="1" cellpadding="8">
+  <tr>
+    <th>Day</th>
+    <th>High</th>
+    <th>Low</th>
+  </tr>
+  <tr>
+    <td>Monday</td>
+    <td>18°C</td>
+    <td>9°C</td>
+  </tr>
+  <tr>
+    <td>Tuesday</td>
+    <td>21°C</td>
+    <td>11°C</td>
+  </tr>
+</table>`},
+{t:"Forms",
+why:`<p>Forms collect input. <code>&lt;input&gt;</code> has many <code>type</code>s: text, email, number, checkbox, date, colour and more. <code>&lt;label&gt;</code> names a field; its <code>for</code> matches the input's <code>id</code>, so clicking the label focuses the field.</p>
+<p>The <code>required</code> attribute makes the browser check the field before sending. (This demo form doesn't send anywhere.)</p>`,
+tasks:["Change type=\"email\" to type=\"date\" and see a date picker.","Add a checkbox: &lt;input type=\"checkbox\"&gt; Subscribe","Press Send with the name empty to see required in action."],
+code:`<h2>Sign up</h2>
+<form onsubmit="event.preventDefault(); alertBox.textContent='Thanks, ' + document.getElementById('name').value + '!'">
+  <p>
+    <label for="name">Your name</label><br>
+    <input id="name" type="text" required>
+  </p>
+  <p>
+    <label for="mail">Email</label><br>
+    <input id="mail" type="email">
+  </p>
+  <p>
+    <label for="colour">Favourite colour</label>
+    <input id="colour" type="color" value="#1d2bd8">
+  </p>
+  <button type="submit">Send</button>
+</form>
+<p id="alertBox"></p>`},
+{t:"Adding style",
+why:`<p>HTML says <em>what</em> things are. CSS says how they <em>look</em>. You can put CSS in a <code>&lt;style&gt;</code> block.</p>
+<p>Each rule picks elements (a <em>selector</em>, like <code>h1</code> or <code>.card</code>) and sets properties like <code>color</code> or <code>padding</code>. A <code>class</code> attribute lets you style some elements and not others.</p>`,
+tasks:["Change the background colour of body.","Change border-radius to 0, then to 40px.","Add class=\"card\" to the last paragraph so it gets styled too."],
+code:`<style>
+  body {
+    font-family: sans-serif;
+    background: #f3f1ff;
+    padding: 20px;
+  }
+  h1 { color: #1d2bd8; }
+  .card {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 12px;
+  }
+</style>
+
+<h1>Styled page</h1>
+<p class="card">I am a card. CSS gave me a white box and a shadow.</p>
+<p class="card">Same class, same look.</p>
+<p>I have no class, so I stay plain.</p>`},
+{t:"Make it do something",
+why:`<p>JavaScript adds behaviour. A <code>&lt;script&gt;</code> can find an element (here by its <code>id</code>) and react when someone clicks.</p>
+<p>So the three languages of the web split the work: <strong>HTML</strong> for structure, <strong>CSS</strong> for looks, <strong>JavaScript</strong> for behaviour.</p>`,
+tasks:["Change count + 1 to count + 10.","Change the button's text.","Make the number turn red: add counter.style.color = 'red'; inside the function."],
+code:`<h1>Click counter</h1>
+<p>You have clicked <span id="counter">0</span> times.</p>
+<button id="btn">Click me</button>
+
+<script>
+  let count = 0;
+  const counter = document.getElementById('counter');
+  document.getElementById('btn').addEventListener('click', function () {
+    count = count + 1;
+    counter.textContent = count;
+  });
+<\/script>`}
+];
+const nav=document.getElementById('nav'),ed=document.getElementById('ed'),pv=document.getElementById('pv'),
+lt=document.getElementById('lt'),why=document.getElementById('why'),tasks=document.getElementById('tasks'),
+st=document.getElementById('status');
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+let cur=0,timer=null;
+nav.innerHTML=L.map((l,i)=>`<button type="button" role="tab" id="tab-${i}" aria-selected="false" data-i="${i}"><span class="n">${i+1}</span>${l.t}</button>`).join('');
+const render=()=>{pv.classList.add('fade');pv.srcdoc=ed.value;setTimeout(()=>pv.classList.remove('fade'),150);st.textContent='Updates as you type'};
+const open=i=>{
+  cur=i;
+  for(const b of nav.children)b.setAttribute('aria-selected',b.dataset.i==i?'true':'false');
+  lt.textContent=(i+1)+'. '+L[i].t;
+  why.innerHTML=L[i].why;
+  tasks.innerHTML=L[i].tasks.map(t=>`<li>${t}</li>`).join('');
+  ed.value=store.get('lh-'+i)??L[i].code;
+  render();
+  store.set('lh-cur',i);
+  if(location.hash!=='#lesson-'+(i+1))history.replaceState(null,'','#lesson-'+(i+1));
+};
+nav.addEventListener('click',e=>{const b=e.target.closest('button');if(b)open(+b.dataset.i)});
+ed.addEventListener('input',()=>{st.textContent='Typing…';clearTimeout(timer);timer=setTimeout(()=>{render();store.set('lh-'+cur,ed.value)},300)});
+ed.addEventListener('keydown',e=>{if(e.key==='Tab'&&!e.shiftKey){e.preventDefault();const s=ed.selectionStart,en=ed.selectionEnd;ed.value=ed.value.slice(0,s)+'  '+ed.value.slice(en);ed.selectionStart=ed.selectionEnd=s+2;ed.dispatchEvent(new Event('input'))}});
+document.getElementById('reset').addEventListener('click',()=>{store.del('lh-'+cur);ed.value=L[cur].code;render()});
+document.getElementById('copy').addEventListener('click',async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText(ed.value);b.textContent='Copied'}catch(err){ed.select();b.textContent='Selected, press Ctrl+C'}setTimeout(()=>b.textContent='Copy',1800)});
+const fromHash=()=>{const m=location.hash.match(/^#lesson-(\d+)$/);return m&&+m[1]>=1&&+m[1]<=L.length?+m[1]-1:null};
+window.addEventListener('hashchange',()=>{const h=fromHash();if(h!==null&&h!==cur)open(h)});
+const saved=+store.get('lh-cur');
+open(fromHash()??(saved>=0&&saved<L.length?saved:0));
+}
+</script>
+</body>
+</html>
 
